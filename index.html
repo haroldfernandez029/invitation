@@ -619,6 +619,13 @@
         }
 
     </style>
+
+    <!-- EmailJS: sends invitation responses without exposing an email password -->
+    <script
+        type="text/javascript"
+        src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js">
+    </script>
+
 </head>
 
 
@@ -751,6 +758,42 @@
 
 
         /* =========================================
+           EMAILJS CONFIGURATION
+        =========================================
+           Replace these 3 values with your EmailJS
+           Service ID, Template ID and Public Key.
+        ========================================= */
+
+        const EMAILJS_PUBLIC_KEY = "j9Kdjzb-2hPVrpYJX";
+        const EMAILJS_SERVICE_ID = "service_1ezu2eu";
+        const EMAILJS_TEMPLATE_ID = "template_hvxonhl";
+
+        emailjs.init({
+            publicKey: EMAILJS_PUBLIC_KEY
+        });
+
+
+        /* =========================================
+           SEND RESPONSE BY EMAIL
+        ========================================= */
+
+        function sendInvitationResponse(response) {
+
+            const templateParams = {
+                response: response,
+                response_time: new Date().toLocaleString(),
+                page_url: window.location.href
+            };
+
+            return emailjs.send(
+                EMAILJS_SERVICE_ID,
+                EMAILJS_TEMPLATE_ID,
+                templateParams
+            );
+        }
+
+
+        /* =========================================
            ELEMENTS
         ========================================== */
 
@@ -774,7 +817,7 @@
            YES BUTTON
         ========================================== */
 
-        yesButton.addEventListener("click", () => {
+        yesButton.addEventListener("click", async () => {
 
             successOverlay.classList.add("active");
 
@@ -785,6 +828,23 @@
 
             createCelebration();
 
+            try {
+
+                await sendInvitationResponse("YES 💗");
+
+                console.log(
+                    "Coffee invitation response sent successfully."
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "The invitation was displayed, but the email could not be sent.",
+                    error
+                );
+
+            }
+
         });
 
 
@@ -793,7 +853,28 @@
            MOVES TO A NEW LOCATION EVERY CLICK
         ========================================== */
 
-        noButton.addEventListener("click", moveNoButton);
+        noButton.addEventListener("click", async () => {
+
+            try {
+
+                await sendInvitationResponse("NO 🙈");
+
+                console.log(
+                    "Coffee invitation response sent successfully."
+                );
+
+            } catch (error) {
+
+                console.error(
+                    "The No button moved, but the email could not be sent.",
+                    error
+                );
+
+            }
+
+            moveNoButton();
+
+        });
 
         function moveNoButton() {
 
